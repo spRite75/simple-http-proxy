@@ -1,0 +1,11 @@
+{
+  "name": "@lukem124/simple-http",
+  "version": "1.0.0",
+  "description": "Super simple http proxy for forwarding web requests",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Luke Montgomery",
+  "license": "ISC"
+}
