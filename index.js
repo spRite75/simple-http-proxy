@@ -2,16 +2,16 @@ const program = require('commander');
 const httpProxy = require('http-proxy');
 const logger = require('./log');
 
-
 main();
 
 function main() {
     program
         .version('1.0.0')
+        .name('simple-http-proxy')
+        .usage('-t https://your-domain.com')
         .option('-t, --target <hostname>', 'target host to proxy requests to',)
         .option('-p, --port <port>', 'local port to run the proxy on', parseInt, '5000')
         .option('--changeOrigin', 'change the origin of the host header to the target')
-        .option('--logNonJSONResponses', 'always try to log the response, even if it isn\'t a valid object')
         .parse(process.argv);
     
     if (!validateParams(program)) {
@@ -21,8 +21,7 @@ function main() {
     startProxy({
         target: program.target,
         changeOrigin: program.changeOrigin,
-        port: program.port,
-        logNonJSONResponses: program.logNonJSONResponses
+        port: program.port
     });
 
     logger.logInfo('Proxy server started.')
@@ -39,7 +38,7 @@ function validateParams(program) {
 
 function startProxy(opts) {
     logger.logInfo('Staring a proxy with the following config: \n', opts)
-    const { target, changeOrigin, port, logNonJSONResponses } = opts;
+    const { target, changeOrigin, port } = opts;
     const server = httpProxy.createProxyServer({
         target: target,
         changeOrigin: changeOrigin
@@ -52,20 +51,7 @@ function startProxy(opts) {
             req.url
         ];
 
-        const bodyChunks = [];
-
-        req.on('data', (chunk) => {
-            bodyChunks.push(chunk.toString());
-        });
-
         req.on('end', () => {
-            if (bodyChunks.length > 0) {
-                try {
-                    toLog.push('\n body:', JSON.parse(bodyChunks.join('')));
-                } catch {
-                    toLog.push('\n body:', bodyChunks.join(''));
-                }
-            }
             logger.logInfo(...toLog);
         });
     });
@@ -76,20 +62,7 @@ function startProxy(opts) {
             proxyRes.statusCode
         ];
 
-        const bodyChunks = [];
-
-        proxyRes.on('data', (chunk) => {
-            bodyChunks.push(chunk.toString());
-        });
-
         proxyRes.on('end', () => {
-            if (bodyChunks.length > 0) {
-                try {
-                    toLog.push('\n body:', JSON.parse(bodyChunks.join('')));
-                } catch {
-                    toLog.push('\n body:', bodyChunks.join(''));
-                }
-            }
             logger.logInfo(...toLog);
         });
     });

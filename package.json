@@ -3,7 +3,11 @@
   "version": "1.0.0",
   "description": "Super simple http proxy for forwarding web requests",
   "main": "index.js",
+  "bin": {
+    "simple-http-proxy": "index.js"
+  },
   "scripts": {
+    "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Luke Montgomery",
